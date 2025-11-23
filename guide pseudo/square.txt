@@ -1,0 +1,68 @@
+LỚP Square:
+
+  // --- 1. HÀM KHỞI TẠO ---
+  // (x, y là tọa độ logic, vd: (0, 0) là ô A8, (7, 7) là ô H1)
+  // (width, height là kích thước pixel của 1 ô)
+  HÀM __init__(x, y, width, height):
+    
+    // --- Lưu trữ tọa độ logic ---
+    đặt self.x = x
+    đặt self.y = y
+    đặt self.pos = (x, y) // Vd: (0, 0)
+    
+    // --- Lưu trữ kích thước pixel ---
+    đặt self.width = width
+    đặt self.height = height
+    
+    // --- Tính toán tọa độ pixel tuyệt đối ---
+    // (Vị trí pixel góc trên bên trái của ô cờ này trên màn hình)
+    đặt self.abs_x = x * width
+    đặt self.abs_y = y * height
+    đặt self.abs_pos = (self.abs_x, self.abs_y)
+    
+    // --- Trạng thái ô cờ ---
+    đặt self.quân_cờ_đang_đứng = KHÔNG CÓ GÌ (None)
+    đặt self.highlight = False // (Có đang được tô sáng không?)
+
+    // --- Màu sắc ---
+    // (Kiểm tra (x+y) là chẵn hay lẻ để quyết định màu)
+    đặt self.color = 'dark' NẾU (x + y) % 2 == 0 NGƯỢC LẠI 'light'
+    đặt self.draw_color = MÀU_Ô_TỐI NẾU self.color == 'dark' NGƯỢC LẠI MÀU_Ô_SÁNG
+    đặt self.highlight_color = MÀU_TÔ_SÁNG_TỐI NẾU self.color == 'dark' NGƯỢC LẠI MÀU_TÔ_SÁNG_SÁNG
+    
+    // --- Định danh (Notation) ---
+    đặt self.coord = GỌI HÀM self.get_coord() // Vd: 'a8'
+    
+    // --- Tạo hình chữ nhật Pygame ---
+    // (Để Pygame dễ dàng vẽ ô này)
+    đặt self.rect = HÌNH_CHỮ_NHẬT(self.abs_x, self.abs_y, self.width, self.height)
+
+
+  // --- 2. HÀM LẤY ĐỊNH DANH ---
+  HÀM get_coord():
+    đặt cột = 'abcdefgh'
+    // (Lưu ý: y của bàn cờ (0-7) ngược với định danh cờ vua (8-1))
+    // (Trong code của bạn, y=0 là hàng 8, y=7 là hàng 1)
+    // (Vì vậy, self.y + 1 được dùng trong code gốc của bạn)
+    TRẢ VỀ cột[self.x] + CHUYỂN_SỐ_THÀNH_CHUỖI(self.y + 1)
+
+
+  // --- 3. HÀM VẼ ---
+  HÀM draw(màn_hình):
+  
+    // 3a. Quyết định màu vẽ
+    NẾU (self.highlight == True):
+      màu_vẽ = self.highlight_color
+    NGƯỢC LẠI:
+      màu_vẽ = self.draw_color
+      
+    // 3b. Vẽ hình chữ nhật của ô cờ
+    VẼ_HÌNH_CHỮ_NHẬT(lên màn_hình, màu_vẽ, tại self.rect)
+    
+    // 3c. Vẽ quân cờ (nếu có)
+    NẾU (self.quân_cờ_đang_đứng KHÔNG PHẢI None):
+      quân_cờ = self.quân_cờ_đang_đứng
+      // (Căn giữa hình ảnh quân cờ vào giữa ô cờ)
+      VẼ_HÌNH_ẢNH(màn_hình, quân_cờ.img, tại vị_trí_căn_giữa)
+      
+KẾT THÚC LỚP

@@ -1,0 +1,123 @@
+LỚP Board:
+
+  // --- 1. HÀM KHỞI TẠO (constructor) ---
+  HÀM __init__(chiều_rộng, chiều_cao):
+    // Lưu trữ kích thước
+    đặt self.width = chiều_rộng
+    đặt self.height = chiều_cao
+    đặt self.kích_thước_ô = chiều_rộng / 8
+    
+    // Trạng thái game
+    đặt self.quân_cờ_đã_chọn = KHÔNG CÓ GÌ (None)
+    đặt self.lượt_chơi = 'white'
+    
+    // Cấu hình bàn cờ (m: đen, w: trắng; R: Xe, N: Mã, K: Vua, v.v.)
+    đặt self.config = [
+      ['bR', 'bN', 'bB', 'bQ', 'bK', 'bB', 'bN', 'bR'],
+      ['b ', 'b ', 'b ', 'b ', 'b ', 'b ', 'b ', 'b '],
+      // ... 4 hàng trống ...
+      ['w ', 'w ', 'w ', 'w ', 'w ', 'w ', 'w ', 'w '],
+      ['wR', 'wN', 'wB', 'wQ', 'wK', 'wB', 'wN', 'wR']
+    ]
+    
+    // Tạo ra 64 đối tượng Ô Cờ (Square)
+    đặt self.danh_sách_ô_cờ = GỌI HÀM generate_squares()
+    
+    // Đặt các quân cờ lên bàn cờ dựa trên self.config
+    GỌI HÀM setup_board()
+
+
+  // --- 2. CÁC HÀM KHỞI TẠO PHỤ ---
+  HÀM generate_squares():
+    đặt danh_sách_kết_quả = []
+    LẶP y TỪ 0 ĐẾN 7:
+      LẶP x TỪ 0 ĐẾN 7:
+        TẠO một ô_cờ_mới = Đối tượng Square(x, y, kích_thước_ô)
+        THÊM ô_cờ_mới vào danh_sách_kết_quả
+    TRẢ VỀ danh_sách_kết_quả
+
+  HÀM setup_board():
+    LẶP y TỪ 0 ĐẾN 7:
+      LẶP x TỪ 0 ĐẾN 7:
+        ký_hiệu_quân_cờ = LẤY từ self.config[y][x]
+        
+        NẾU (ký_hiệu_quân_cờ KHÔNG RỖNG):
+          // Lấy màu (chữ cái đầu) và loại quân (chữ cái sau)
+          màu = 'black' NẾU ký_hiệu_quân_cờ[0] == 'b' NGƯỢC LẠI 'white'
+          loại_quân = ký_hiệu_quân_cờ[1]
+          
+          // Tạo đối tượng quân cờ
+          quân_cờ_mới = TẠO Đối tượng Quân Cờ(loại_quân, (x, y), màu)
+          
+          // Đặt quân cờ vào ô
+          ô_cờ = LẤY Ô CỜ TỪ VỊ TRÍ (x, y)
+          đặt ô_cờ.quân_cờ_đang_đứng = quân_cờ_mới
+          
+          
+  // --- 3. HÀM LOGIC CHÍNH ---
+  HÀM handle_click(tọa_độ_x, tọa_độ_y):
+    // (Đây là mã giả chúng ta đã xem chi tiết ở lần trước)
+    
+    ô_cờ_được_click = LẤY_Ô_CỜ_TỪ_TỌA_ĐỘ(tọa_độ_x, tọa_độ_y)
+
+    NẾU (chưa_chọn_quân_cờ_nào):
+      NẾU (ô_cờ_được_click CÓ quân cờ VÀ quân_cờ.màu == self.lượt_chơi):
+        đặt self.quân_cờ_đã_chọn = quân_cờ_trên_ô
+        (Tính toán và tô sáng các nước đi hợp lệ)
+        
+    NGƯỢC LẠI (Tức là đã có một quân cờ được chọn):
+      
+      // Thử di chuyển
+      thành_công = self.quân_cờ_đã_chọn.THỬ_DI_CHUYỂN(đến ô_cờ_được_click)
+      
+      NẾU (thành_công == ĐÚNG):
+        // Đổi lượt
+        đặt self.lượt_chơi = 'black' NẾU self.lượt_chơi == 'white' NGƯỢC LẠI 'white'
+      
+      NGƯỢC LẠI (Di chuyển thất bại):
+        // Bỏ chọn
+        đặt self.quân_cờ_đã_chọn = KHÔNG CÓ GÌ
+        
+      (Bỏ tô sáng tất cả các ô)
+
+
+  // --- 4. HÀM VẼ ---
+  HÀM draw(màn_hình):
+    // 4a. Vẽ các ô cờ
+    LẶP QUA TỪNG ô_cờ TRONG self.danh_sách_ô_cờ:
+      ô_cờ.draw(màn_hình) // (Vẽ ô vuông màu sáng/tối)
+      
+    // 4b. Vẽ các quân cờ
+    LẶP QUA TỪNG ô_cờ TRONG self.danh_sách_ô_cờ:
+      NẾU (ô_cờ CÓ quân cờ):
+        ô_cờ.vẽ_quân_cờ(màn_hình) // (Vẽ hình ảnh quân cờ lên trên ô)
+
+
+  // --- 5. CÁC HÀM KIỂM TRA (Helpers) ---
+  HÀM is_in_check(màu_vua):
+    // Kiểm tra xem Vua của 'màu_vua' có đang bị tấn công không
+    TÌM vị_trí_vua của 'màu_vua'.
+    LẶP QUA TẤT CẢ quân_cờ của đối thủ:
+      NẾU (bất kỳ quân_cờ nào của đối thủ CÓ THỂ TẤN CÔNG vị_trí_vua):
+        TRẢ VỀ True
+    TRẢ VỀ False
+
+  HÀM is_in_checkmate(màu_vua):
+    // Kiểm tra xem 'màu_vua' có bị chiếu hết không
+    NẾU (is_in_check(màu_vua) == False):
+      TRẢ VỀ False // Không bị chiếu thì không thể chiếu hết
+      
+    // Lấy tất cả các quân cờ của 'màu_vua'
+    LẶP QUA TỪNG quân_cờ của 'màu_vua':
+      LẶP QUA TỪNG nước_đi_hợp_lệ của quân_cờ đó:
+        // Thử di chuyển
+        GIẢ VỜ di chuyển quân_cờ đến nước_đi đó.
+        NẾU (sau khi GIẢ VỜ đi, is_in_check(màu_vua) == False):
+          HỦY GIẢ VỜ.
+          TRẢ VỀ False // Vẫn còn ít nhất 1 nước đi để thoát chiếu
+        HỦY GIẢ VỜ.
+        
+    // Nếu lặp qua tất cả quân cờ và tất cả nước đi mà không thoát được chiếu
+    TRẢ VỀ True // Bị chiếu hết!
+
+KẾT THÚC LỚP

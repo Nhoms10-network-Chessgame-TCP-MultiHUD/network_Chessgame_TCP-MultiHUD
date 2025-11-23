@@ -1,0 +1,52 @@
+BẮT ĐẦU CLIENT:
+  1. Tạo Socket.
+  2. CONNECT (Kết nối) đến IP và Port của Server.
+  3. In ra "Đã kết nối, đang chờ gán màu..."
+
+  // --- GIAI ĐOẠN NHẬN MÀU (RẤT QUAN TRỌNG) ---
+  4. CHỜ và NHẬN dữ liệu (ví dụ: `color_data = s.recv()`).
+  5. Nếu `color_data` == "white":
+     - Đặt [Màu_Của_Tôi] = 'white'.
+     - Đặt [Lượt_Của_Tôi] = true.
+  6. Ngược lại nếu `color_data` == "black":
+     - Đặt [Màu_Của_Tôi] = 'black'.
+     - Đặt [Lượt_Của_Tôi] = false.
+  7. Ngược lại (nếu nhận được rác hoặc không gì cả):
+     - In ra "LỖI: Không nhận được màu hợp lệ!".  <--- ĐÂY LÀ LỖI CỦA BẠN
+     - Thoát.
+  // ------------------------------------------
+
+  8. In ra "Bạn là phe [Màu_Của_Tôi]".
+
+  9. Khởi tạo Pygame, tạo cửa sổ GUI.
+ 10. Tạo 1 đối tượng [Board] (bàn cờ của riêng client này để vẽ lên).
+ 11. Tạo 1 [Queue] (để nhận nước đi của ĐỐI THỦ từ server).
+ 12. Tạo 1 [Thread]:
+     - Luồng 1: Liên tục nhận dữ liệu từ Server -> bỏ vào [Queue] (đây là nước đi của đối thủ).
+
+ 13. VÒNG LẶP GAME CHÍNH (Pygame):
+    
+    // PHẦN 1: XỬ LÝ NƯỚC ĐI CỦA ĐỐI THỦ
+    A. Kiểm tra xem [Queue] có gì không:
+       - Nếu có, LẤY (mx, my) của đối thủ ra.
+       - Áp dụng (mx, my) vào [Board] của client (để cập nhật hình ảnh).
+       - Nếu [Board] báo lượt đã đổi về [Màu_Của_Tôi]:
+         - Đặt [Lượt_Của_Tôi] = true.
+
+    // PHẦN 2: XỬ LÝ INPUT CỦA NGƯỜI CHƠI
+    B. Kiểm tra các sự kiện Pygame (click chuột, đóng cửa sổ):
+       - Nếu là ĐÓNG CỬA SỔ: Dừng vòng lặp.
+       - Nếu là CLICK CHUỘT:
+         - KIỂM TRA nếu [Lượt_Của_Tôi] == true:
+           - Lấy (mx, my) từ cú click.
+           - Áp dụng (mx, my) vào [Board] của client.
+           - GỬI (mx, my) cho Server.
+           - Nếu [Board] báo đã đổi lượt (không còn là [Màu_Của_Tôi]):
+             - Đặt [Lượt_Của_Tôi] = false.
+
+    // PHẦN 3: VẼ LÊN MÀN HÌNH
+    C. Xóa màn hình.
+    D. Vẽ [Board] của client lên màn hình.
+    E. Cập nhật Pygame display.
+
+ 14. KẾT THÚC: Đóng kết nối, đóng Pygame.

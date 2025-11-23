@@ -1,0 +1,133 @@
+LỚP Piece:
+
+  // --- 1. HÀM KHỞI TẠO ---
+  HÀM __init__(vị_trí, màu, bàn_cờ):
+    // Vị trí (x, y) trên bàn cờ
+    đặt self.pos = vị_trí
+    đặt self.x = vị_trí[0]
+    đặt self.y = vị_trí[1]
+    
+    // Màu sắc
+    đặt self.color = màu
+    
+    // Đánh dấu xem quân cờ này đã di chuyển lần nào chưa (quan trọng cho Nhập thành)
+    đặt self.has_moved = False
+    
+    // (Các lớp con như Bishop, King... sẽ tải hình ảnh (img) và ký hiệu (notation) ở đây)
+
+
+  // --- 2. HÀM DI CHUYỂN CHÍNH ---
+  // Đây là hàm để THỰC HIỆN nước đi
+  HÀM move(bàn_cờ, ô_đến, ép_buộc=False):
+  
+    // Bỏ tô sáng tất cả các ô trên bàn cờ
+    LẶP QUA TỪNG ô TRONG bàn_cờ.danh_sách_ô_cờ:
+      đặt ô.highlight = False
+      
+    // Kiểm tra xem nước đi có hợp lệ không
+    // (Hàm get_valid_moves sẽ kiểm tra cả việc tự chiếu)
+    NẾU (ô_đến CÓ TRONG self.get_valid_moves(bàn_cờ) HOẶC ép_buộc == True):
+      
+      // Lấy ô hiện tại
+      ô_trước = bàn_cờ.LẤY_Ô_TỪ_VỊ_TRÍ(self.pos)
+      
+      // Cập nhật vị trí mới cho quân cờ
+      đặt self.pos = ô_đến.pos
+      đặt self.x = ô_đến.x
+      đặt self.y = ô_đến.y
+      
+      // Cập nhật bàn cờ
+      đặt ô_trước.quân_cờ_đang_đứng = KHÔNG CÓ GÌ (None)
+      đặt ô_đến.quân_cờ_đang_đứng = chính nó (self)
+      
+      // Bỏ chọn quân cờ
+      đặt bàn_cờ.quân_cờ_đã_chọn = KHÔNG CÓ GÌ
+      
+      // Đánh dấu là đã di chuyển
+      đặt self.has_moved = True
+
+      // --- XỬ LÝ ĐẶC BIỆT ---
+
+      // 1. Xử lý Phong Tốt
+      NẾU (self.notation == ' '): // ' ' là ký hiệu của Tốt
+        NẾU (self.y == 0 HOẶC self.y == 7): // (Đã đến hàng cuối)
+          TẠO Nữ Hoàng mới = Queen(self.pos, self.color, bàn_cờ)
+          đặt ô_đến.quân_cờ_đang_đứng = Nữ Hoàng mới
+
+      // 2. Xử lý Nhập Thành (Vua di chuyển)
+      NẾU (self.notation == 'K'): // 'K' là ký hiệu của Vua
+        // Nếu Vua di chuyển 2 ô (tức là nhập thành)
+        NẾU (ô_trước.x - self.x == 2): // Nhập thành Cánh Hậu
+          LẤY Xe = bàn_cờ.LẤY_QUÂN_CỜ_TỪ_VỊ_TRÍ((0, self.y))
+          LẤY ô_đến_cho_xe = bàn_cờ.LẤY_Ô_TỪ_VỊ_TRÍ((3, self.y))
+          Xe.move(bàn_cờ, ô_đến_cho_xe, ép_buộc=True) // Ép Xe di chuyển
+          
+        NGƯỢC LẠI NẾU (ô_trước.x - self.x == -2): // Nhập thành Cánh Vua
+          LẤY Xe = bàn_cờ.LẤY_QUÂN_CỜ_TỪ_VỊ_TRÍ((7, self.y))
+          LẤY ô_đến_cho_xe = bàn_cờ.LẤY_Ô_TỪ_VỊ_TRÍ((5, self.y))
+          Xe.move(bàn_cờ, ô_đến_cho_xe, ép_buộc=True) // Ép Xe di chuyển
+
+      TRẢ VỀ True // Di chuyển thành công
+
+    NGƯỢC LẠI: // Nước đi không hợp lệ
+      đặt bàn_cờ.quân_cờ_đã_chọn = KHÔNG CÓ GÌ
+      TRẢ VỀ False // Di chuyển thất bại
+
+
+  // --- 3. CÁC HÀM LẤY NƯỚC ĐI ---
+  
+  // (Hàm này sẽ được định nghĩa ở lớp con (Vua, Xe, Tượng...))
+  HÀM get_possible_moves(bàn_cờ):
+    // Trả về một DANH SÁCH CÁC DÃY nước đi (vd: Tượng trả về 4 dãy đường chéo)
+    TRẢ VỀ []
+
+  // Hàm này lọc các dãy nước đi ở trên
+  HÀM get_moves(bàn_cờ):
+    đặt danh_sách_kết_quả = []
+    
+    // Lấy các dãy nước đi từ lớp con (vd: 4 đường chéo của Tượng)
+    LẶP QUA TỪNG dãy_nước_đi TRONG self.get_possible_moves(bàn_cờ):
+      LẶP QUA TỪNG ô TRONG dãy_nước_đi:
+        
+        NẾU (ô CÓ quân cờ):
+          NẾU (quân_cờ.màu == self.color): // Gặp quân ta
+            DỪNG LẶP (break) dãy này // Bị chặn bởi quân ta
+          NGƯỢC LẠI: // Gặp quân địch
+            THÊM ô vào danh_sách_kết_quả // Ăn được quân địch
+            DỪNG LẶP (break) dãy này // Bị chặn bởi quân địch
+        NGƯỢC LẠI: // Ô trống
+          THÊM ô vào danh_sách_kết_quả
+          
+    TRẢ VỀ danh_sách_kết_quả
+
+  // Hàm quan trọng nhất: Lọc các nước đi tự sát (tự chiếu)
+  HÀM get_valid_moves(bàn_cờ):
+    đặt danh_sách_hợp_lệ = []
+    
+    // Lấy tất cả các nước đi có thể (chưa kiểm tra tự chiếu)
+    đặt các_nước_đi = self.get_moves(bàn_cờ)
+    
+    // (Logic của Tốt và Vua khác, nên chúng có hàm get_valid_moves riêng)
+    // (Đây là logic cho Xe, Tượng, Mã, Hậu)
+    
+    LẶP QUA TỪNG ô_đích TRONG các_nước_đi:
+      
+      // --- Thao tác "Giả Vờ Di Chuyển" ---
+      ô_hiện_tại = bàn_cờ.LẤY_Ô_TỪ_VỊ_TRÍ(self.pos)
+      quân_cờ_bị_ăn = ô_đích.quân_cờ_đang_đứng
+      
+      // Di chuyển
+      đặt ô_hiện_tại.quân_cờ_đang_đứng = KHÔNG CÓ GÌ
+      đặt ô_đích.quân_cờ_đang_đứng = chính nó (self)
+      
+      // Kiểm tra xem Vua mình có bị chiếu không
+      NẾU (bàn_cờ.is_in_check(self.color) == False):
+        THÊM ô_đích vào danh_sách_hợp_lệ
+        
+      // --- Hoàn Tác "Giả Vờ" ---
+      đặt ô_hiện_tại.quân_cờ_đang_đứng = chính nó (self)
+      đặt ô_đích.quân_cờ_đang_đứng = quân_cờ_bị_ăn
+      
+    TRẢ VỀ danh_sách_hợp_lệ
+
+KẾT THÚC LỚP

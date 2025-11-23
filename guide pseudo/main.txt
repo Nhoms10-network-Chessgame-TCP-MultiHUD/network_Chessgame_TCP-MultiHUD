@@ -1,0 +1,47 @@
+BẮT ĐẦU CHƯƠNG TRÌNH main:
+
+  // --- 1. Khởi tạo ---
+  KHỞI TẠO Pygame.
+  KHỞI TẠO Cửa sổ game (với kích thước WINDOW_SIZE).
+  KHỞI TẠO Bàn cờ (Board).
+  
+  ĐẶT biến `running` = True.
+
+  // --- 2. Vòng lặp game chính ---
+  VÒNG LẶP (khi `running` là True):
+  
+    // 2a. Lấy input người dùng
+    LẤY vị trí chuột hiện tại (mx, my).
+    
+    // 2b. Xử lý sự kiện
+    LẶP QUA TỪNG SỰ KIỆN (event) mà Pygame bắt được:
+    
+      // Nếu người dùng đóng cửa sổ
+      NẾU (sự kiện là ĐÓNG CỬA SỔ - pygame.QUIT):
+        ĐẶT `running` = False. // Dừng vòng lặp
+        
+      // Nếu người dùng click chuột trái
+      NGƯỢC LẠI NẾU (sự kiện là CLICK CHUỘT TRÁI - MOUSEBUTTONDOWN):
+        // Gọi hàm xử lý logic cờ vua
+        BÀN CỜ.handle_click(mx, my).
+        
+    KẾT THÚC LẶP SỰ KIỆN.
+    
+    // 2c. Kiểm tra điều kiện thắng (Chiếu hết)
+    NẾU (Bàn cờ BỊ CHIẾU HẾT 'đen'):
+      IN "Trắng thắng!".
+      ĐẶT `running` = False. // Dừng game
+    NGƯỢC LẠI NẾU (Bàn cờ BỊ CHIẾU HẾT 'trắng'):
+      IN "Đen thắng!".
+      ĐẶT `running` = False. // Dừng game
+      
+    // 2d. Vẽ lại màn hình
+    GỌI HÀM draw(screen).
+    (Bên trong hàm draw: xóa màn hình, vẽ bàn cờ, cập nhật hiển thị)
+    
+  KẾT THÚC VÒNG LẶP.
+  
+  // --- 3. Dọn dẹp ---
+  THOÁT Pygame.
+
+KẾT THÚC CHƯƠNG TRÌNH.

@@ -1,0 +1,47 @@
+BẮT ĐẦU SERVER:
+  1. Tạo Socket, Bind (gắn) vào IP và Port.
+  2. Listen (Lắng nghe) cho 2 kết nối.
+  3. In ra "Đang chờ 2 người chơi..."
+
+  // --- GIAI ĐOẠN GÁN MÀU (RẤT QUAN TRỌNG) ---
+  4. CHẤP NHẬN kết nối của [Client 1] (lưu là conn_white).
+  5. In ra "Người chơi Trắng đã kết nối".
+  6. GỬI chuỗi "white" cho conn_white.
+
+  7. CHẤP NHẬN kết nối của [Client 2] (lưu là conn_black).
+  8. In ra "Người chơi Đen đã kết nối".
+  9. GỬI chuỗi "black" cho conn_black.
+  // ------------------------------------------
+
+ 10. In ra "Game bắt đầu!"
+
+ 11. Tạo 1 đối tượng [Board] (để server tự quản lý bàn cờ, làm trọng tài).
+ 12. Tạo 2 [Queue] (hàng đợi): white_queue và black_queue.
+ 13. Tạo 2 [Thread] (luồng):
+     - Luồng 1: Liên tục nhận dữ liệu từ conn_white -> bỏ vào white_queue.
+     - Luồng 2: Liên tục nhận dữ liệu từ conn_black -> bỏ vào black_queue.
+
+ 14. Đặt [Lượt_Hiện_Tại] = 'white'.
+
+ 15. VÒNG LẶP GAME CHÍNH (trên server):
+    A. Nếu [Lượt_Hiện_Tại] == 'white':
+       - Chờ và LẤY (mx, my) từ white_queue.
+       - Đặt [Người_Nhận] = conn_black (người chơi còn lại).
+    B. Ngược lại (lượt là 'black'):
+       - Chờ và LẤY (mx, my) từ black_queue.
+       - Đặt [Người_Nhận] = conn_white.
+
+    C. In ra "Nhận click từ [Lượt_Hiện_Tại]".
+    
+    D. Áp dụng (mx, my) vào [Board] của server (để server biết game đang diễn ra thế nào).
+    E. GỬI (mx, my) cho [Người_Nhận] (để client kia biết nước đi).
+
+    F. Nếu [Board] của server báo đã đổi lượt (ví dụ: board.turn != [Lượt_Hiện_Tại]):
+       - Cập nhật [Lượt_Hiện_Tại] = lượt mới.
+       - In ra "Đổi lượt sang...".
+
+    G. Nếu [Board] của server báo chiếu hết:
+       - In ra "GAME OVER".
+       - Dừng vòng lặp.
+
+ 16. KẾT THÚC: Đóng tất cả kết nối.
